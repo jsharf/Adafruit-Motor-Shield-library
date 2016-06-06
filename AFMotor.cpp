@@ -132,8 +132,6 @@ inline void initPWM1(uint8_t freq) {
         // If we are not using PWM for pin 11, then just do digital
         digitalWrite(11, LOW);
     #endif
-#else
-   #error "This chip is not supported!"
 #endif
     #if !defined(PIC32_USE_PIN9_FOR_M1_PWM) && !defined(PIC32_USE_PIN10_FOR_M1_PWM)
         pinMode(11, OUTPUT);
@@ -170,7 +168,7 @@ inline void setPWM1(uint8_t s) {
         }
     #endif
 #else
-   #error "This chip is not supported!"
+  anlogWrite(11, s);
 #endif
 }
 
@@ -201,8 +199,6 @@ inline void initPWM2(uint8_t freq) {
     OC1CON = 0x8006;    // OC32 = 0, OCTSEL=0, OCM=6
     OC1RS = 0x0000;
     OC1R = 0x0000;
-#else
-   #error "This chip is not supported!"
 #endif
 
     pinMode(3, OUTPUT);
@@ -223,7 +219,7 @@ inline void setPWM2(uint8_t s) {
     // Set the OC1 (pin3) PMW duty cycle from 0 to 255
     OC1RS = s;
 #else
-   #error "This chip is not supported!"
+   analogWrite(3, s);
 #endif
 }
 
@@ -255,8 +251,6 @@ inline void initPWM3(uint8_t freq) {
     OC3CON = 0x8006;    // OC32 = 0, OCTSEL=0, OCM=6
     OC3RS = 0x0000;
     OC3R = 0x0000;
-#else
-   #error "This chip is not supported!"
 #endif
     pinMode(6, OUTPUT);
 }
@@ -276,7 +270,7 @@ inline void setPWM3(uint8_t s) {
     // Set the OC3 (pin 6) PMW duty cycle from 0 to 255
     OC3RS = s;
 #else
-   #error "This chip is not supported!"
+   analogWrite(6, s);
 #endif
 }
 
@@ -331,13 +325,42 @@ inline void setPWM4(uint8_t s) {
     // Set the OC2 (pin 5) PMW duty cycle from 0 to 255
     OC2RS = s;
 #else
-   #error "This chip is not supported!"
+   analogWrite(5, OUTPUT);
 #endif
 }
 
 AF_DCMotor::AF_DCMotor(uint8_t num, uint8_t freq) {
   motornum = num;
   pwmfreq = freq;
+
+  MC.enable();
+
+  switch (num) {
+  case 1:
+    latch_state &= ~_BV(MOTOR1_A) & ~_BV(MOTOR1_B); // set both motor pins to 0
+    MC.latch_tx();
+    initPWM1(freq);
+    break;
+  case 2:
+    latch_state &= ~_BV(MOTOR2_A) & ~_BV(MOTOR2_B); // set both motor pins to 0
+    MC.latch_tx();
+    initPWM2(freq);
+    break;
+  case 3:
+    latch_state &= ~_BV(MOTOR3_A) & ~_BV(MOTOR3_B); // set both motor pins to 0
+    MC.latch_tx();
+    initPWM3(freq);
+    break;
+  case 4:
+    latch_state &= ~_BV(MOTOR4_A) & ~_BV(MOTOR4_B); // set both motor pins to 0
+    MC.latch_tx();
+    initPWM4(freq);
+    break;
+  }
+}
+
+AF_DCMotor::AF_DCMotor(uint8_t num) {
+  motornum = num;
 
   MC.enable();
 
@@ -416,6 +439,8 @@ void AF_DCMotor::setSpeed(uint8_t speed) {
                STEPPERS
 ******************************************/
 
+// Note: Steppers are not supported for all board types.
+#if HARDWARE_KNOWN
 AF_Stepper::AF_Stepper(uint16_t steps, uint8_t num) {
   MC.enable();
 
@@ -664,4 +689,4 @@ uint8_t AF_Stepper::onestep(uint8_t dir, uint8_t style) {
   MC.latch_tx();
   return currentstep;
 }
-
+#endif
