@@ -168,7 +168,7 @@ inline void setPWM1(uint8_t s) {
         }
     #endif
 #else
-  anlogWrite(11, s);
+  analogWrite(11, s);
 #endif
 }
 
@@ -304,8 +304,6 @@ inline void initPWM4(uint8_t freq) {
     OC2CON = 0x8006;    // OC32 = 0, OCTSEL=0, OCM=6
     OC2RS = 0x0000;
     OC2R = 0x0000;
-#else
-   #error "This chip is not supported!"
 #endif
     pinMode(5, OUTPUT);
 }
@@ -329,6 +327,7 @@ inline void setPWM4(uint8_t s) {
 #endif
 }
 
+#if HARDWARE_KNOWN
 AF_DCMotor::AF_DCMotor(uint8_t num, uint8_t freq) {
   motornum = num;
   pwmfreq = freq;
@@ -358,7 +357,7 @@ AF_DCMotor::AF_DCMotor(uint8_t num, uint8_t freq) {
     break;
   }
 }
-
+#else
 AF_DCMotor::AF_DCMotor(uint8_t num) {
   motornum = num;
 
@@ -368,26 +367,22 @@ AF_DCMotor::AF_DCMotor(uint8_t num) {
   case 1:
     latch_state &= ~_BV(MOTOR1_A) & ~_BV(MOTOR1_B); // set both motor pins to 0
     MC.latch_tx();
-    initPWM1(freq);
     break;
   case 2:
     latch_state &= ~_BV(MOTOR2_A) & ~_BV(MOTOR2_B); // set both motor pins to 0
     MC.latch_tx();
-    initPWM2(freq);
     break;
   case 3:
     latch_state &= ~_BV(MOTOR3_A) & ~_BV(MOTOR3_B); // set both motor pins to 0
     MC.latch_tx();
-    initPWM3(freq);
     break;
   case 4:
     latch_state &= ~_BV(MOTOR4_A) & ~_BV(MOTOR4_B); // set both motor pins to 0
     MC.latch_tx();
-    initPWM4(freq);
     break;
   }
 }
-
+#endif
 void AF_DCMotor::run(uint8_t cmd) {
   uint8_t a, b;
   switch (motornum) {
