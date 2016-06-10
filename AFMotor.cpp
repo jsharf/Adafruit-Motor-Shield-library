@@ -59,9 +59,11 @@ void AFMotorController::latch_tx(void) {
   //SER_PORT &= ~_BV(SER);
   digitalWrite(MOTORDATA, LOW);
 
+  delay(1);
   for (i=0; i<8; i++) {
     //CLK_PORT &= ~_BV(CLK);
     digitalWrite(MOTORCLK, LOW);
+    delay(1);
 
     if (latch_state & _BV(7-i)) {
       //SER_PORT |= _BV(SER);
@@ -70,8 +72,10 @@ void AFMotorController::latch_tx(void) {
       //SER_PORT &= ~_BV(SER);
       digitalWrite(MOTORDATA, LOW);
     }
+    delay(1);
     //CLK_PORT |= _BV(CLK);
     digitalWrite(MOTORCLK, HIGH);
+    delay(1);
   }
   //LATCH_PORT |= _BV(LATCH);
   digitalWrite(MOTORLATCH, HIGH);
