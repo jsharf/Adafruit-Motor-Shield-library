@@ -367,18 +367,22 @@ AF_DCMotor::AF_DCMotor(uint8_t num) {
   case 1:
     latch_state &= ~_BV(MOTOR1_A) & ~_BV(MOTOR1_B); // set both motor pins to 0
     MC.latch_tx();
+    pinMode(11, OUTPUT);
     break;
   case 2:
     latch_state &= ~_BV(MOTOR2_A) & ~_BV(MOTOR2_B); // set both motor pins to 0
     MC.latch_tx();
+    pinMode(3, OUTPUT);
     break;
   case 3:
     latch_state &= ~_BV(MOTOR3_A) & ~_BV(MOTOR3_B); // set both motor pins to 0
     MC.latch_tx();
+    pinMode(6, OUTPUT);
     break;
   case 4:
     latch_state &= ~_BV(MOTOR4_A) & ~_BV(MOTOR4_B); // set both motor pins to 0
     MC.latch_tx();
+    pinMode(5, OUTPUT);
     break;
   }
 }
